@@ -12,6 +12,10 @@ class Api::V1::UsersController < ApplicationController
     render json: UserSerializer.format_user_list(User.all)
   end
 
+  #NOTE: Additional logic to implement:
+  # - retrieve user profile endpoint
+  # - maybe: add user to viewing party (though may just use #update in VP controller)
+
   private
 
   def user_params

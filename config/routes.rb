@@ -11,6 +11,11 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: [:create, :index]
       resources :sessions, only: :create
+
+      #Need to add some more here.  For now, no nesting needed.  Of note:
+      #Users - update the above: retrieve profile (show)
+      #Movies - get top rated (index), search (index), details (show)
+      #ViewingParty - new party (create), add new user (update)
     end
   end
 end
