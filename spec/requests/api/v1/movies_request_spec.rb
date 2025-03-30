@@ -4,6 +4,8 @@ RSpec.describe "Movies API", type: :request do
   describe "List top-rated movies" do
     context "happy path (request valid)" do
       it "contains correct fields" do
+        #Need to setup mocking / stubbing ASAP now that I know it's working
+        
         get api_v1_movies_path
         movies_json = JSON.parse(response.body, symbolize_names: true)
 
