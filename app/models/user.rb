@@ -5,4 +5,7 @@ class User < ApplicationRecord
   has_secure_password
   has_secure_token :api_key
 
+  has_many :viewing_party_registrations
+  has_many :viewing_parties, through: :viewing_party_registrations
+
 end
