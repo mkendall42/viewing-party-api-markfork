@@ -20,4 +20,20 @@ class ViewingPartySerializer
       }
     }
   end
+
+  def self.format_parties_short(parties)
+    return [] if !parties
+
+    return parties.reduce([]) do |all_parties, party|
+      all_parties << {
+        id: party.id,
+        name: party.name,
+        start_time: party.start_time,
+        end_time: party.end_time,
+        movie_id: party.movie_id,
+        movie_title: party.movie_title,
+        host_id: party.find_host.id
+      }
+    end
+  end
 end
