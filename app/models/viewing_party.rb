@@ -3,6 +3,11 @@ class ViewingParty < ApplicationRecord
   has_many :viewing_party_registrations
   has_many :users, through: :viewing_party_registrations
 
+  validates :name, presence: true
+  validates :start_time, presence: true
+  validates :end_time, presence: true, comparison: { greater_than: :start_time }
+  validates :movie_id, presence: true
+
   # def initialize(viewing_party_params)
   #   #Do I want to call this first, or super() first?  (or is super() even needed?)
   #   create_registrations(viewing_party_params[:invitees])
@@ -22,21 +27,12 @@ class ViewingParty < ApplicationRecord
   # end
 
   def set_host(user_id)
-    #Update DB record with user's registration as host for this party
-
-    # binding.pry
-
     #First, reset all hosts to false, then update [new] specified host to true
     viewing_party_registrations.each do |registration|
       registration.set_host_status(false)
     end
 
-    binding.pry
-
     viewing_party_registrations.find_by(user_id: user_id).set_host_status(true)
-    # viewing_party_registrations.find_by(user_id: user_id).is_host = true
-    # viewing_party_registrations.find_by(user_id: user_id).save
-
   end
 
   def find_host

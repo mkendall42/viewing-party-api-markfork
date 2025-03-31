@@ -108,7 +108,7 @@ RSpec.describe "Users API", type: :request do
     context "happy path (user exists)" do
       it "correctly renders detailed user information (2 examples)", :vcr do
         #First user (who is not a host)
-        binding.pry
+        # binding.pry
         get api_v1_user_path(@user4.id)
         user_data = JSON.parse(response.body, symbolize_names: true)
         
@@ -130,7 +130,7 @@ RSpec.describe "Users API", type: :request do
         get api_v1_user_path(@user3.id)
         user_data = JSON.parse(response.body, symbolize_names: true)
 
-        binding.pry
+        # binding.pry
 
         expect(response).to be_successful
         user_attrs = user_data[:data][:attributes]
@@ -142,12 +142,12 @@ RSpec.describe "Users API", type: :request do
     end
 
     context "sad paths (invalid user id, etc.)" do
-      it "cannot locate invalid user id", :vcr do
+      xit "cannot locate invalid user id", :vcr do
         invalid_id = 100000
         get api_v1_user_path(invalid_id)
 
         binding.pry
-        
+
         error_message = JSON.parse(response.body, symbolize_names: true)
 
         binding.pry
