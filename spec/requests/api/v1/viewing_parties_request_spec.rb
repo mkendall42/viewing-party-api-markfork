@@ -27,34 +27,34 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         expect(response).to be_successful
 
         #Test for the moment:
-        # binding.pry
+        binding.pry
 
-        expect(created_party_data).to eq({ data: "created" })
+        # expect(created_party_data).to eq({ data: "created" })
 
         #General structure of JSON response
-        # expect(created_party_data).to have_key(:data)
-        # expect(created_party_data[:data]).to be_a(Hash)
-        # expect(created_party_data[:data][:id]).to be_a(Integer)
-        # expect(created_party_data[:data][:type]).to eq("viewing_party")
-        # expect(created_party_data[:data][:attributes]).to be_a(Hash)
-        # expect(created_party_data[:data][:attributes][:name]).to eq("Post-BroodWar Bash")
-        # expect(created_party_data[:data][:attributes][:start_time]).to eq("2025-02-01 10:00:00")
-        # expect(created_party_data[:data][:attributes][:end_time]).to eq("2025-02-01 14:30:00")
-        # expect(created_party_data[:data][:attributes][:movie_id]).to eq(278)
-        # expect(created_party_data[:data][:attributes][:movie_id]).to eq("The Shawshank Redemption")
-        # expect(created_party_data[:data][:attributes][:invitees]).to be_a(Array)
+        expect(created_party_data).to have_key(:data)
+        expect(created_party_data[:data]).to be_a(Hash)
+        expect(created_party_data[:data][:id]).to be_a(Integer)
+        expect(created_party_data[:data][:type]).to eq("viewing_party")
+        expect(created_party_data[:data][:attributes]).to be_a(Hash)
+        expect(created_party_data[:data][:attributes][:name]).to eq("Post-BroodWar Bash")
+        expect(created_party_data[:data][:attributes][:start_time].include?("10:00:00")).to eq(true)    #Due to slightly different date/time formatting on these lines, just look for substring
+        expect(created_party_data[:data][:attributes][:end_time].include?("14:30:00")).to eq(true)
+        expect(created_party_data[:data][:attributes][:movie_id]).to eq(278)
+        expect(created_party_data[:data][:attributes][:movie_title]).to eq("The Shawshank Redemption")
+        expect(created_party_data[:data][:attributes][:invitees]).to be_a(Array)
         
         # #Invitee specific information
-        # invitees = created_party_data[:data][:attributes][:invitees]
-        # expect(invitees[0][:id]).to eq(@user1.id)
-        # expect(invitees[0][:name]).to eq(@user1.name)
-        # expect(invitees[0][:username]).to eq(@user1.username)
-        # expect(invitees[1][:id]).to eq(@user3.id)
-        # expect(invitees[1][:name]).to eq(@user3.name)
-        # expect(invitees[1][:username]).to eq(@user3.username)
-        # expect(invitees[2][:id]).to eq(@user4.id)
-        # expect(invitees[2][:name]).to eq(@user4.name)
-        # expect(invitees[2][:username]).to eq(@user4.username)
+        invitees = created_party_data[:data][:attributes][:invitees]
+        expect(invitees[0][:id]).to eq(@user1.id)
+        expect(invitees[0][:name]).to eq(@user1.name)
+        expect(invitees[0][:username]).to eq(@user1.username)
+        expect(invitees[1][:id]).to eq(@user3.id)
+        expect(invitees[1][:name]).to eq(@user3.name)
+        expect(invitees[1][:username]).to eq(@user3.username)
+        expect(invitees[2][:id]).to eq(@user4.id)
+        expect(invitees[2][:name]).to eq(@user4.name)
+        expect(invitees[2][:username]).to eq(@user4.username)
 
         #NOTE: there HAS to be a way to do this more efficiently than the above!!!
         #Maybe make a memoized method or something at least?
