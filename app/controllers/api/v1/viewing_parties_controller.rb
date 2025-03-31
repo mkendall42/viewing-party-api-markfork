@@ -49,15 +49,15 @@ class Api::V1::ViewingPartiesController < ApplicationController
     render json: ViewingPartySerializer.format_party_data(new_party)
   end
 
-  def update
-    #This could also make sense under User controller
-    party = ViewingParty.find(viewing_party_update_params[:id])
-    #NOTE: below is not doing anything.  Perhaps this makes sense, since we're not exactly updating ViewingParty...we're creating a new ViewingPartyRegistration entry.
-    #Does this mean I need a new controller just for that action?  Argh!
-    party.update!(viewing_party_update_params)
+  # def update
+  #   #This could also make sense under User controller
+  #   party = ViewingParty.find(viewing_party_update_params[:id])
+  #   #NOTE: below is not doing anything.  Perhaps this makes sense, since we're not exactly updating ViewingParty...we're creating a new ViewingPartyRegistration entry.
+  #   #Does this mean I need a new controller just for that action?  Argh!
+  #   party.update!(viewing_party_update_params)
 
-    render json: ViewingPartySerializer.format_party_data(party)
-  end
+  #   render json: ViewingPartySerializer.format_party_data(party)
+  # end
 
   private
 
@@ -66,8 +66,8 @@ class Api::V1::ViewingPartiesController < ApplicationController
     params.require(:viewing_party).permit(:name, :start_time, :end_time, :movie_id, :movie_title, :invitees)
   end
 
-  def viewing_party_update_params
-    params.permit(:id, :invitee_id)
-  end
+  # def viewing_party_update_params
+  #   params.permit(:id, :invitee_id)
+  # end
 
 end
