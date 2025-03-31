@@ -32,3 +32,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Miscellaneous
+/coverage/
+# /spec/fixtures/vcr_cassettes/OLD_BINARY_contains_correct_fields.yml

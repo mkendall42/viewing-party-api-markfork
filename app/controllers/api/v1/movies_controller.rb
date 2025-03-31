@@ -21,6 +21,8 @@ class Api::V1::MoviesController < ApplicationController
     response = connection.get("/3/movie/top_rated")
     movie_list_data = JSON.parse(response.body, symbolize_names: true)
 
+    # binding.pry
+
     top_movies = movie_list_data[:results].reduce([]) do |movies, movie_data|
       movies << Movie.new(movie_data)
     end
@@ -28,7 +30,6 @@ class Api::V1::MoviesController < ApplicationController
     #Remember to return only max of 20 entries (should be page limit, but add it nonetheless)
     top_movies = top_movies[0..19] if top_movies.length > 20
 
-    binding.pry
 
     #Do I need to send a specific code, or just 200?
     render json: MovieSerializer.format_movie_list(top_movies)

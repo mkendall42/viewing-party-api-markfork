@@ -3,14 +3,14 @@ require "rails_helper"
 RSpec.describe "Movies API", type: :request do
   describe "List top-rated movies" do
     context "happy path (request valid)" do
-      it "contains correct fields" do
+      it "contains correct fields", :vcr do
         #Need to setup mocking / stubbing ASAP now that I know it's working
 
         #A complication: how to stub 'nested' request
         get api_v1_movies_path
         movies_json = JSON.parse(response.body, symbolize_names: true)
 
-        binding.pry
+        # binding.pry
 
         expect(response).to be_successful
 
@@ -27,11 +27,9 @@ RSpec.describe "Movies API", type: :request do
         end
       end
 
-      xit "lists a maximum of 20 movies" do
-        #No fancy way to test this short of querying multiple pages on TMDB methinks...
-        #Check class is Array as well
+      it "lists a maximum of 20 movies" do
         movies_data = []
-        21.times do |i|
+        25.times do |i|
           misc_movie_data = {
             id: i,
             title: "Some movie #{i}",
@@ -41,11 +39,13 @@ RSpec.describe "Movies API", type: :request do
           movies_data << misc_movie_data
         end
 
-        #Now I'd have to stub this to access the controller...
+        #Stub TMDB for appropriate response in controller
+        stub_request(:get, "https://api.themoviedb.org/3/movie/top_rated").to_return(status: 200, body: ({ results: movies_data }).to_json)
+        get api_v1_movies_path
 
-        # binding.pry
-
-        #Opt: stub an empty reply - verify it's [] (separate test)
+        misc_movies_json = JSON.parse(response.body, symbolize_names: true)
+        expect(misc_movies_json[:data]).to be_a(Array)
+        expect(misc_movies_json[:data].length).to eq(20)
       end
     end
 

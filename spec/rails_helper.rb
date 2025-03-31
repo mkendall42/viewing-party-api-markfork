@@ -79,4 +79,7 @@ VCR.configure do |config|
   config.filter_sensitive_data("<TMDB KEY>") { Rails.application.credentials.tmdb[:bearer_token] }
   config.configure_rspec_metadata!      #Allows :vcr to be used in RSpec - handy!
   # config.default_cassette_options = { re_record_interval: 14.days }
+  config.before_record do |i|           #Prevents binary encoding (kinda tough to read...)
+    i.response.body.force_encoding('UTF-8')
+  end
 end
