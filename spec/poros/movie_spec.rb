@@ -32,7 +32,7 @@ RSpec.describe "Movie class" do
     }
 
     cast_info = [
-      #Note: this is an array per what MovieGateway returns!
+      #Note: this is an array per what MovieGateway would return
       {
         name: "Keir Dullea",
         original_name: "the same",
@@ -79,5 +79,4 @@ RSpec.describe "Movie class" do
     expect(great_movie.reviews[0][:author]).to eq("Johnny B Goode")
     expect(great_movie.reviews[0][:review]).to eq("It was great")
   end
-
 end

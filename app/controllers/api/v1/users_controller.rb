@@ -12,9 +12,14 @@ class Api::V1::UsersController < ApplicationController
     render json: UserSerializer.format_user_list(User.all)
   end
 
-  #NOTE: Additional logic to implement:
-  # - retrieve user profile endpoint
-  # - maybe: add user to viewing party (though may just use #update in VP controller)
+  def show
+    if !(user = User.find(params[:id]))
+      #NOTE: needs exception handling to really deal with this properly
+      render json: { message: "Error: user id=#{params[:id]} does not exist.", status: 404 }, status: 404
+    else
+      render json: UserSerializer.format_single_user(user)
+    end
+  end
 
   private
 

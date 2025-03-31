@@ -22,16 +22,9 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         }
 
         post api_v1_viewing_parties_path, params: party_info, as: :json
-        # post api_v1_artist_songs_path(@prince), params: song_params, as: :json
         created_party_data = JSON.parse(response.body, symbolize_names: true)
 
         expect(response).to be_successful
-
-        #Test for the moment:
-        # binding.pry
-
-        # expect(created_party_data).to eq({ data: "created" })
-
         #General structure of JSON response
         expect(created_party_data).to have_key(:data)
         expect(created_party_data[:data]).to be_a(Hash)
@@ -44,7 +37,6 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         expect(created_party_data[:data][:attributes][:movie_id]).to eq(278)
         expect(created_party_data[:data][:attributes][:movie_title]).to eq("The Shawshank Redemption")
         expect(created_party_data[:data][:attributes][:invitees]).to be_a(Array)
-        
         # #Invitee specific information
         invitees = created_party_data[:data][:attributes][:invitees]
         expect(invitees[0][:id]).to eq(@user1.id)
@@ -59,12 +51,6 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
 
         #NOTE: there HAS to be a way to do this more efficiently than the above!!!
         #Maybe make a memoized method or something at least?
-        # invitees_array = [@user1, @user3, @user4]
-        # created_party_data[:data][:attributes][:invitees].each do |invitee|
-        #   expect(invitee[:id]).to include()
-        #   expect(invitees_array)
-        # end
-        # expect(created_party_data[:data][:attributes][:movie_id]).to eq("The Shawshank Redemption")
       end
 
       it "ignores any extraneous parameters", :vcr do
@@ -103,13 +89,13 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
           # "host": @user1.id
         }
 
-        post api_v1_viewing_parties_path, params: party_info, as: :json
+        post api_v1_viewing_parties_path, params: party_info_missing_params, as: :json
         party_response = JSON.parse(response.body, symbolize_names: true)
 
         expect(response).to_not be_successful
 
-        #Need to add validation, and then deal with exception handling methinks here...
-        
+        #NOTE: need to deal with exception handling
+        #NOTE: validation only happens at create(), but this is too late...how to get to occur sooner?
       end
       
       it "new party duration is less than movie length (and/or end time is before start time)", :vcr do
@@ -125,9 +111,7 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         post api_v1_viewing_parties_path, params: party_info, as: :json
         party_response = JSON.parse(response.body, symbolize_names: true)
 
-        # binding.pry
-
-        expect(response).to_not be_successful     #Test specific code?
+        expect(response).to_not be_successful
         expect(party_response).to be_a(Hash)
         expect(party_response.keys.length).to eq(2)
         expect(party_response[:message]).to eq("Error: movie runtime is longer than party duration; please make start_date and end_date sufficiently far apart.")
@@ -135,32 +119,4 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
       end
     end
   end
-
-  describe "add new user to viewing party" do
-    context "happy path (request valid)" do
-      it "can add existing user to an existing party", :vcr do
-        great_party = ViewingParty.create!(name: "Post-BroodWar Speedrun", start_time: "2025-04-02 19:00:00", end_time: "2025-04-02 22:30:00", movie_id: 278, movie_title: "The Shawshank Redemption")
-        ViewingPartyRegistration.create!(user_id: @user1.id, viewing_party_id: great_party.id, is_host: true)
-        ViewingPartyRegistration.create!(user_id: @user3.id, viewing_party_id: great_party.id, is_host: false)
-        ViewingPartyRegistration.create!(user_id: @user4.id, viewing_party_id: great_party.id, is_host: false)
-        user_to_add_params = {
-          viewing_party_id: great_party.id,
-          invitees_user_id: @user2.id
-        }
-        
-        patch api_v1_viewing_party_registrations_path, params: user_to_add_params, as: :json
-        # patch api_v1_viewing_party_path(great_party.id), params: user_to_add_params, as: :json
-        party_response = JSON.parse(response.body, symbolize_names: true)
-        
-        binding.pry
-
-        expect(response).to be_successful
-        expect(party_response[:data][:attributes][:invitees].length).to eq(4)
-        expect(party_response[:data][:attributes][:invitees]).to include({ id: @user2.id, name: @user2.name, username: @user2.username })
-
-      end
-
-    end
-  end
-
 end

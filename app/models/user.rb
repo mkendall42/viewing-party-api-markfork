@@ -8,4 +8,13 @@ class User < ApplicationRecord
   has_many :viewing_party_registrations
   has_many :viewing_parties, through: :viewing_party_registrations
 
+  def viewing_parties_hosted
+    viewing_parties.find_all do |party|
+      party.find_host == self
+    end
+  end
+
+  def viewing_parties_invited
+    viewing_parties
+  end
 end

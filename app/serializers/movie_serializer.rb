@@ -1,8 +1,5 @@
 class MovieSerializer
   def self.format_movie_list(movies)
-    #For listing multiple movies (simpler dataset returned)
-    # movies_array = []
-    # movies.each do |movie|
     movies_array = movies.reduce([]) do |acc, movie|
       movie_hash = {
         id: movie.id,
@@ -38,5 +35,4 @@ class MovieSerializer
       }
     }
   end
-
 end
