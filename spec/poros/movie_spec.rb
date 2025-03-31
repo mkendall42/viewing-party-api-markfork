@@ -72,7 +72,7 @@ RSpec.describe "Movie class" do
     #Cast info
     expect(great_movie.cast.length).to eq(3)
     expect(great_movie.cast[2][:character]).to eq("HAL")
-    expect(great_movie.cast[2][:name]).to eq("HAL 9000, the scariest AI ever")
+    expect(great_movie.cast[2][:actor]).to eq("HAL 9000, the scariest AI ever")
     #Reviews info
     expect(great_movie.total_reviews).to eq(2)
     expect(great_movie.reviews.length).to eq(2)

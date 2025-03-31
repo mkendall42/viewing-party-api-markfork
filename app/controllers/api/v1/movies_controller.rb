@@ -44,10 +44,13 @@ class Api::V1::MoviesController < ApplicationController
   def show
     #External API calls to TMDB (multiple req'd due to cast and reviews peripheral data)
     movie_details_data = MovieGateway.get_movie_details(params[:id])
-    movie = Movie.new(movie_details_data)
+    movie = Movie.new(movie_details_data, true)
+    movie.add_cast_and_reviews(MovieGateway.get_movie_cast_details(movie.id), MovieGateway.get_movie_reviews_details(movie.id))
     
-    render json: { data: "empty for now" }
-    # render json: MovieSerializer.new(movie)
+    binding.pry
+
+    # render json: { data: "empty for now" }
+    render json: MovieSerializer.format_movie_details(movie)
   end
 
 end

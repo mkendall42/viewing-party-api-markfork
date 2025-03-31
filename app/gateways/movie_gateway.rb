@@ -1,6 +1,9 @@
 class MovieGateway
   #Handles connections and returning appropriate dataset(s)
 
+  #NOTE: IDEA FOR POLYMORPHISM: connedtion = Faraday.new stuff, then inherit smaller classes to call specific 'gets'
+  #This seems awfully 'manufactured' just to sneak this in though...
+
   def self.get_top_movies_data
     connection = Faraday.new(url: "https://api.themoviedb.org") do |faraday|
       #NOTE: the actual key needed the prefix "Bearer <token>".  Arrrgh!
@@ -60,5 +63,14 @@ class MovieGateway
 
   def self.get_movie_reviews_details(movie_id)
     #
+    connection = Faraday.new(url: "https://api.themoviedb.org") do |faraday|
+      faraday.headers["Authorization"] = Rails.application.credentials.tmdb[:bearer_token]
+    end
+
+    response = connection.get("/3/movie/#{movie_id}/reviews")
+
+    JSON.parse(response.body, symbolize_names: true)
+
+    # movie_reviews[:results]
   end
 end

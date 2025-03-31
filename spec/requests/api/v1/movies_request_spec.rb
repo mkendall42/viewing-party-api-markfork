@@ -111,11 +111,15 @@ RSpec.describe "Movies API", type: :request do
   end
 
   describe "Shows details for a specified movie" do
-    it "correctly returns all movie details" do
+    it "correctly returns all movie details", :vcr do
+      #NOTE: again, VCR issue?
+
       specified_movie_id = 278    #Shawshank Redemption at TMDB (unless they reorder the IDs!)
       get api_v1_movie_path(specified_movie_id)
       movie_details = JSON.parse(response.body, symbolize_names: true)
 
+      binding.pry
+      
       expect(response).to be_successful
       #General structure
       expect(movie_details).to have_key(:data)
