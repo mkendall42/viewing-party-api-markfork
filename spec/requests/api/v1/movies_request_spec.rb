@@ -6,6 +6,7 @@ RSpec.describe "Movies API", type: :request do
       it "contains correct fields" do
         #Need to setup mocking / stubbing ASAP now that I know it's working
 
+        #A complication: how to stub 'nested' request
         get api_v1_movies_path
         movies_json = JSON.parse(response.body, symbolize_names: true)
 
@@ -26,11 +27,25 @@ RSpec.describe "Movies API", type: :request do
         end
       end
 
-      it "lists a maximum of 20 movies" do
+      xit "lists a maximum of 20 movies" do
         #No fancy way to test this short of querying multiple pages on TMDB methinks...
         #Check class is Array as well
+        movies_data = []
+        21.times do |i|
+          misc_movie_data = {
+            id: i,
+            title: "Some movie #{i}",
+            vote_average: i % 10
+          }
 
-        #Opt: stub an empty reply - verify it's []
+          movies_data << misc_movie_data
+        end
+
+        #Now I'd have to stub this to access the controller...
+
+        # binding.pry
+
+        #Opt: stub an empty reply - verify it's [] (separate test)
       end
     end
 
