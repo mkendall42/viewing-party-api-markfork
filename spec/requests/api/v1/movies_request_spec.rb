@@ -110,4 +110,54 @@ RSpec.describe "Movies API", type: :request do
 
   end
 
+  describe "Shows details for a specified movie" do
+    it "correctly returns all movie details" do
+      specified_movie_id = 278    #Shawshank Redemption at TMDB (unless they reorder the IDs!)
+      get api_v1_movie_path(specified_movie_id)
+      movie_details = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to be_successful
+      #General structure
+      expect(movie_details).to have_key(:data)
+      expect(movie_details[:data]).to have_key(:id)
+      expect(movie_details[:data][:id]).to eq(specified_movie_id)
+      expect(movie_details[:data]).to have_key(:type)
+      expect(movie_details[:data][:type]).to eq("movie")
+      expect(movie_details[:data]).to have_key(:attributes)
+      expect(movie_details[:data][:attributes]).to have_key(:title)
+      expect(movie_details[:data][:attributes]).to have_key(:release_year)
+      expect(movie_details[:data][:attributes]).to have_key(:vote_average)
+      expect(movie_details[:data][:attributes]).to have_key(:runtime)
+      expect(movie_details[:data][:attributes]).to have_key(:genres)
+      expect(movie_details[:data][:attributes][:genres]).to be_a(Array)
+      expect(movie_details[:data][:attributes]).to have_key(:summary)
+      
+
+      #Cast details, including limit to 10
+      expect(movie_details[:data][:attributes]).to have_key(:cast)
+      expect(movie_details[:data][:attributes][:cast]).to be_a(Array)
+      expect(movie_details[:data][:attributes][:cast].length).to eq(10)
+      movie_details[:data][:attributes][:cast].each do |cast_member|
+        expect(cast_member).to be_a(Hash)
+        expect(cast_member).to have_key(:character)
+        expect(cast_member).to have_key(:actor)
+      end
+
+      #Reviews details, including limit to 5
+      expect(movie_details[:data][:attributes]).to have_key(:total_reviews)
+      expect(movie_details[:data][:attributes][:total_reviews]).to be_a(Integer)
+      expect(movie_details[:data][:attributes]).to have_key(:reviews)
+      expect(movie_details[:data][:attributes][:reviews]).to be_a(Array)
+      expect(movie_details[:data][:attributes][:reviews].length).to eq(5)
+      movie_details[:data][:attributes][:reviews].each do |reviewer|
+        expect(reviewer).to be_a(Hash)
+        expect(reviewer).to have_key(:author)
+        expect(reviewer).to have_key(:review)
+      end
+    end
+
+    #Should probably do sad path if movie ID doesn't exist via TMDB API call...
+
+  end
+
 end

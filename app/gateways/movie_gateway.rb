@@ -35,7 +35,30 @@ class MovieGateway
   #   filtered_movies
   # end
 
-  def self.get_movie_details(movie)
+  def self.get_movie_details(movie_id)
+    connection = Faraday.new(url: "https://api.themoviedb.org") do |faraday|
+      faraday.headers["Authorization"] = Rails.application.credentials.tmdb[:bearer_token]
+    end
 
+    response = connection.get("/3/movie/#{movie_id}")
+
+    JSON.parse(response.body, symbolize_names: true)
+
+    #Do I want to massage this / explicitly call a Movie object, or be consistent and just return raw data?
+  end
+
+  def self.get_movie_cast_details(movie_id)
+    connection = Faraday.new(url: "https://api.themoviedb.org") do |faraday|
+      faraday.headers["Authorization"] = Rails.application.credentials.tmdb[:bearer_token]
+    end
+
+    response = connection.get("/3/movie/#{movie_id}/credits")
+    movie_credits = JSON.parse(response.body, symbolize_names: true)
+
+    movie_credits[:cast]      #Only return the cast (not all data)
+  end
+
+  def self.get_movie_reviews_details(movie_id)
+    #
   end
 end
