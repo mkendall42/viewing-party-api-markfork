@@ -1,20 +1,28 @@
 class Movie
-  attr_reader :id, :title, :vote_average
+  attr_reader :id, :title, :vote_average, :summary, :release_year, :runtime, :genres, :cast, :total_reviews, :reviews
 
-  def initialize(movie_data)
+  def initialize(movie_data, is_detailed_info = false)
     @id = movie_data[:id]
     @title = movie_data[:title]
     @vote_average = movie_data[:vote_average]
 
     #Instance vars only for movie details (just nil otherwise)
-    @summary = movie_data[:overview]
-    @release_year = movie_data[:release_date]     #Maybe: just pull out year
-    @runtime = movie_data[:runtime]
-    @genres = extract_genres(movie_data[:genres])
-    @cast = extract_cast(MovieGateway.get_movie_cast_details(movie_data[:id]))        #This should be constrained to <= 10.  SHIT; this is not listed here, probably requires another call...
-    #Placeholder for now - need extractor method later
-    @total_reviews = 0
-    @reviews = 0     #This should be constrained to <= 5
+    if is_detailed_info
+      @summary = movie_data[:overview]
+      @release_year = movie_data[:release_date]     #Maybe: just pull out year
+      @runtime = movie_data[:runtime]
+      @genres = extract_genres(movie_data[:genres])
+      # @cast = extract_cast(MovieGateway.get_movie_cast_details(movie_data[:id]))        #This should be constrained to <= 10.  SHIT; this is not listed here, probably requires another call...
+      #Placeholder for now - need extractor method later
+      # @total_reviews = 0
+      # @reviews = 0     #This should be constrained to <= 5
+    end
+  end
+
+  def add_cast_and_reviews(cast_data, review_data)
+    @cast = extract_cast(cast_data)
+    @total_reviews = review_data[:total_results]
+    @reviews = extract_reviews(review_data)
   end
 
   def self.create_movie_list(movie_list_data, max_entries)
@@ -44,6 +52,16 @@ class Movie
     cast_members = cast_members[0..9] if cast_members.length > 10
 
     cast_members
+  end
+
+  def extract_reviews(review_data)
+    reviews = review_data[:results].reduce([]) do |all_reviews, review|
+      all_reviews << { author: review[:author], review: review[:content] }
+    end
+
+    reviews = reviews[0..4] if reviews.length > 5
+
+    reviews
   end
 
 end
