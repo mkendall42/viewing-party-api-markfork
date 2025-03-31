@@ -10,7 +10,7 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
 
   describe "create new viewing party" do
     context "happy path (creation request valid)" do
-      it "can create viewing party, return proper status" do
+      it "can create viewing party, return proper status", :vcr do
         party_info = {
           "name": "Post-BroodWar Bash",
           "start_time": "2025-02-01 10:00:00",
@@ -27,7 +27,7 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         expect(response).to be_successful
 
         #Test for the moment:
-        binding.pry
+        # binding.pry
 
         # expect(created_party_data).to eq({ data: "created" })
 
@@ -72,7 +72,28 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
     end
 
     context "sad path (invalid creation requests, edge cases)" do
+      it "new party duration is less than movie length (and/or end time is before start time)", :vcr do
+        party_info = {
+          "name": "Post-BroodWar Speedrun",
+          "start_time": "2025-02-01 10:00:00",
+          "end_time": "2025-02-01 11:45:00",
+          "movie_id": 278,
+          "movie_title": "The Shawshank Redemption",
+          "invitees": [@user1.id, @user2.id]
+        }
 
+        post api_v1_viewing_parties_path, params: party_info, as: :json
+        # post api_v1_artist_songs_path(@prince), params: song_params, as: :json
+        party_response = JSON.parse(response.body, symbolize_names: true)
+
+        # binding.pry
+
+        expect(response).to_not be_successful     #Test specific code?
+        expect(party_response).to be_a(Hash)
+        expect(party_response.keys.length).to eq(2)
+        expect(party_response[:message]).to eq("Error: movie runtime is longer than party duration; please make start_date and end_date sufficiently far apart.")
+        expect(party_response[:status]).to eq(400)
+      end
     end
   end
 

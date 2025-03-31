@@ -10,7 +10,22 @@ class Api::V1::ViewingPartiesController < ApplicationController
 
     #Run an external TMDB request to get movie duration (requires valid movie ID, etc.)
     #Is that sad path necessary to handle?
-    
+    movie_details_data = MovieGateway.get_movie_details(viewing_party_params[:movie_id])
+
+    # binding.pry
+
+    # movie_details_data = MovieGateway.get_movie_details(params[:id])
+    movie = Movie.new(movie_details_data, true)
+    party_time_minutes = (params[:end_time].to_datetime - params[:start_time].to_datetime) * 24 * 60
+    # binding.pry
+
+    if movie.runtime > party_time_minutes.to_f
+      #Note: this inequality structuring automatically captures an end time before start time error as well
+      
+      # render json: ErrorSerializer.format_error(elapsed_time_error)
+      render json: { message: "Error: movie runtime is longer than party duration; please make start_date and end_date sufficiently far apart.", status: 400}, status: 400
+      return
+    end
 
     #Create the viewing party
     new_party = ViewingParty.create!(viewing_party_params)
