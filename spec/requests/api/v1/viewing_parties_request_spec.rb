@@ -66,8 +66,26 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         # expect(created_party_data[:data][:attributes][:movie_id]).to eq("The Shawshank Redemption")
       end
 
-      it "ignores any extraneous parameters" do
+      it "ignores any extraneous parameters", :vcr do
+        party_info_extra_params = {
+          "name": "Post-BroodWar Bash",
+          "start_time": "2025-02-01 10:00:00",
+          "end_time": "2025-02-01 14:30:00",
+          "movie_id": 278,
+          "movie_title": "The Shawshank Redemption",
+          "invitees": [@user1.id, @user3.id, @user4.id],
+          "some_parameter": "I'm sneaking in, mwahaha!",
+          "created_at": "2025-01-01 00:00:01"
+        }
 
+        post api_v1_viewing_parties_path, params: party_info_extra_params, as: :json
+        created_party_data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(created_party_data[:data]).to_not have_key(:some_parameter)
+        expect(created_party_data[:data][:attributes]).to_not have_key(:some_parameter)
+        created_party = ViewingParty.find(created_party_data[:data][:id])
+        expect(created_party.created_at).to_not eq("2025-01-01 00:00:01")
       end
     end
 
