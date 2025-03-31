@@ -2,7 +2,7 @@ class Api::V1::MoviesController < ApplicationController
 
   #This will handle:
   # - [DONE] List top rated movies (index)
-  # - Search movies (index)
+  # - [PENDING - STUBBING ERROR] Search movies (index)
   # - Movie details (show)
 
   def index
