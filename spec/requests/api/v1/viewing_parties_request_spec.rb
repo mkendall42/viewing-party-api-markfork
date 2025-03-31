@@ -92,7 +92,7 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
     end
 
     context "sad path (invalid creation requests, edge cases)" do
-      it "party request is missing required parameter(s)", :vcr, do
+      it "party request is missing required parameter(s)", :vcr do
         party_info_missing_params = {
           "name": "Post-BroodWar Speedrun",
           "start_time": "2025-02-01 10:00:00",
@@ -133,6 +133,29 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         expect(party_response[:message]).to eq("Error: movie runtime is longer than party duration; please make start_date and end_date sufficiently far apart.")
         expect(party_response[:status]).to eq(400)
       end
+    end
+  end
+
+  describe "add new user to viewing party" do
+    context "happy path (request valid)" do
+      it "can add existing user to an existing party", :vcr do
+        user_to_add_params = { invitees_user_id: @user2.id }
+        great_party = ViewingParty.create!(name: "Post-BroodWar Speedrun", start_time: "2025-04-02 19:00:00", end_time: "2025-04-02 22:30:00", movie_id: 278, movie_title: "The Shawshank Redemption")
+        ViewingPartyRegistration.create!(user_id: @user1.id, viewing_party_id: great_party.id, is_host: true)
+        ViewingPartyRegistration.create!(user_id: @user3.id, viewing_party_id: great_party.id, is_host: false)
+        ViewingPartyRegistration.create!(user_id: @user4.id, viewing_party_id: great_party.id, is_host: false)
+        
+        patch api_v1_viewing_party_path(great_party.id), params: user_to_add_params, as: :json
+        party_response = JSON.parse(response.body, symbolize_names: true)
+        
+        binding.pry
+
+        expect(response).to be_successful
+        expect(party_response[:data][:attributes][:invitees].length).to eq(4)
+        expect(party_response[:data][:attributes][:invitees]).to include({ id: @user2.id, name: @user2.name, username: @user2.username })
+
+      end
+
     end
   end
 
