@@ -4,6 +4,14 @@ class Api::V1::ViewingPartiesController < ApplicationController
   # - Create new viewing party (create)
   # - Probaby: add new user to party (update) (could do via Users controller, but seems a little 'out of scope' there...)
   def create
+    #First, check that things make sense:
+    # - Start time is before end time (implied / handled by the next point)
+    # - Party duration is less than runtime
+
+    #Run an external TMDB request to get movie duration (requires valid movie ID, etc.)
+    #Is that sad path necessary to handle?
+    
+
     #Create the viewing party
     new_party = ViewingParty.create!(viewing_party_params)
     #Register / associate the users with the party (can't forget this...like I did!)
