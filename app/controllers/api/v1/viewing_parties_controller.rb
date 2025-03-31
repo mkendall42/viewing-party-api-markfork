@@ -38,8 +38,12 @@ class Api::V1::ViewingPartiesController < ApplicationController
       found_user = User.find(invitee_id)
       ViewingPartyRegistration.create!(user_id: found_user.id, viewing_party_id: new_party.id)
     end
+
+    #Don't forget to set the party host!
+    new_party.set_host(params[:host])
     
     # binding.pry
+    new_party.find_host
 
     # render json: { data: "created" }
     render json: ViewingPartySerializer.format_party_data(new_party)

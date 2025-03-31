@@ -17,7 +17,8 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
           "end_time": "2025-02-01 14:30:00",
           "movie_id": 278,
           "movie_title": "The Shawshank Redemption",
-          "invitees": [@user1.id, @user3.id, @user4.id]   #Just passing integers risky - IDs will likely change in DB over time...
+          "invitees": [@user1.id, @user3.id, @user4.id],   #Just passing integers risky - IDs will likely change in DB over time...
+          "host": @user1.id
         }
 
         post api_v1_viewing_parties_path, params: party_info, as: :json
@@ -74,6 +75,7 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
           "movie_id": 278,
           "movie_title": "The Shawshank Redemption",
           "invitees": [@user1.id, @user3.id, @user4.id],
+          "host": @user1.id,
           "some_parameter": "I'm sneaking in, mwahaha!",
           "created_at": "2025-01-01 00:00:01"
         }
@@ -90,6 +92,26 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
     end
 
     context "sad path (invalid creation requests, edge cases)" do
+      it "party request is missing required parameter(s)", :vcr, do
+        party_info_missing_params = {
+          "name": "Post-BroodWar Speedrun",
+          "start_time": "2025-02-01 10:00:00",
+          # "end_time": "2025-02-01 11:45:00",
+          "movie_id": 278,
+          "movie_title": "The Shawshank Redemption",
+          # "invitees": [@user1.id, @user2.id],
+          # "host": @user1.id
+        }
+
+        post api_v1_viewing_parties_path, params: party_info, as: :json
+        party_response = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to_not be_successful
+
+        #Need to add validation, and then deal with exception handling methinks here...
+        
+      end
+      
       it "new party duration is less than movie length (and/or end time is before start time)", :vcr do
         party_info = {
           "name": "Post-BroodWar Speedrun",
@@ -101,7 +123,6 @@ RSpec.describe "Viewing Parties - create, add users", type: :request do
         }
 
         post api_v1_viewing_parties_path, params: party_info, as: :json
-        # post api_v1_artist_songs_path(@prince), params: song_params, as: :json
         party_response = JSON.parse(response.body, symbolize_names: true)
 
         # binding.pry

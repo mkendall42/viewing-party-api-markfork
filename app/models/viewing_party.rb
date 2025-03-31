@@ -20,4 +20,27 @@ class ViewingParty < ApplicationRecord
   #     ViewingPartyRegistration.create!(found_user.id, self.id)
   #   end
   # end
+
+  def set_host(user_id)
+    #Update DB record with user's registration as host for this party
+
+    # binding.pry
+
+    #First, reset all hosts to false, then update [new] specified host to true
+    viewing_party_registrations.each do |registration|
+      registration.set_host_status(false)
+    end
+
+    binding.pry
+
+    viewing_party_registrations.find_by(user_id: user_id).set_host_status(true)
+    # viewing_party_registrations.find_by(user_id: user_id).is_host = true
+    # viewing_party_registrations.find_by(user_id: user_id).save
+
+  end
+
+  def find_host
+    #Assumes only one host (no co-hosting) for now
+    viewing_party_registrations.find_by(is_host: true).user
+  end
 end
