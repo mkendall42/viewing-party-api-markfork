@@ -21,7 +21,6 @@ RSpec.describe "Viewing Party Registrations", type: :request do
       ViewingPartyRegistration.create!(user_id: @user4.id, viewing_party_id: great_party.id, is_host: false)
       user_to_add_params = {
         viewing_party_id: @great_party.id,
-        # invitees_user_id: @user2.id
         user_id: @user2.id
       }
       
@@ -47,8 +46,6 @@ RSpec.describe "Viewing Party Registrations", type: :request do
       expect(response).to_not be_successful
       expect(error_response[:message]).to eq("Error: viewing party with id=#{invalid_party_id_params[:viewing_party_id]} could not be found.")
       expect(error_response[:status]).to eq(404)
-      # { message: "Error: movie runtime is longer than party duration; please make start_date and end_date sufficiently far apart.", status: 400}, status: 400
-
     end
 
     it "invitee (user) id is invalid", :vcr do
@@ -61,11 +58,8 @@ RSpec.describe "Viewing Party Registrations", type: :request do
       error_response = JSON.parse(response.body, symbolize_names: true)
 
       expect(response).to_not be_successful
-      expect(error_response[:message]).to eq("Error: viewing party with id=#{invalid_party_id_params[:viewing_party_id]} could not be found.")
+      expect(error_response[:message]).to eq("Error: viewing party with id=#{invalid_user_id_params[:viewing_party_id]} could not be found.")
       expect(error_response[:status]).to eq(404)
     end
-
   end
-  
-
 end

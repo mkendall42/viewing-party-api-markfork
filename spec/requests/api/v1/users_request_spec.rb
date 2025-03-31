@@ -76,9 +76,9 @@ RSpec.describe "Users API", type: :request do
       User.create!(name: "Beyonce", username: "sasha_fierce", password: "blueivy")
       
       get api_v1_users_path
+      json = JSON.parse(response.body, symbolize_names: true)
       
       expect(response).to be_successful
-      json = JSON.parse(response.body, symbolize_names: true)
       
       expect(json[:data].count).to eq(3)
       expect(json[:data][0][:attributes]).to have_key(:name)
@@ -108,10 +108,8 @@ RSpec.describe "Users API", type: :request do
     context "happy path (user exists)" do
       it "correctly renders detailed user information (2 examples)", :vcr do
         #First user (who is not a host)
-        # binding.pry
         get api_v1_user_path(@user4.id)
         user_data = JSON.parse(response.body, symbolize_names: true)
-        
         
         expect(response).to be_successful
         expect(user_data[:data][:id]).to eq(@user4.id)
@@ -130,8 +128,6 @@ RSpec.describe "Users API", type: :request do
         get api_v1_user_path(@user3.id)
         user_data = JSON.parse(response.body, symbolize_names: true)
 
-        # binding.pry
-
         expect(response).to be_successful
         user_attrs = user_data[:data][:attributes]
         expect(user_attrs[:viewing_parties_hosted]).to be_a(Array)
@@ -146,11 +142,9 @@ RSpec.describe "Users API", type: :request do
         invalid_id = 100000
         get api_v1_user_path(invalid_id)
 
-        binding.pry
-
         error_message = JSON.parse(response.body, symbolize_names: true)
 
-        binding.pry
+        #NOTE: add error message checking (once full exception handling works)
       end
     end
   end

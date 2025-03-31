@@ -2,72 +2,53 @@ require "rails_helper"
 
 RSpec.describe "Movies API", type: :request do
   describe "List top-rated movies" do
-    context "happy path (request valid)" do
-      it "contains correct fields", :vcr do
-        #Need to setup mocking / stubbing ASAP now that I know it's working
+    it "contains correct fields", :vcr do
+      get api_v1_movies_path
+      movies_json = JSON.parse(response.body, symbolize_names: true)
 
-        #A complication: how to stub 'nested' request
-        get api_v1_movies_path
-        movies_json = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to be_successful
+      expect(movies_json).to have_key(:data)
+      expect(movies_json[:data]).to be_a(Array)
 
-        # binding.pry
-
-        expect(response).to be_successful
-
-        expect(movies_json).to have_key(:data)
-        expect(movies_json[:data]).to be_a(Array)
-
-        movies_json[:data].each do |movie_data|
-          expect(movie_data).to have_key(:id)
-          expect(movie_data).to have_key(:type)
-          expect(movie_data[:type]).to eq("movie")
-          expect(movie_data).to have_key(:attributes)
-          expect(movie_data[:attributes]).to have_key(:title)
-          expect(movie_data[:attributes]).to have_key(:vote_average)
-        end
-      end
-
-      it "lists a maximum of 20 movies" do
-        movies_data = []
-        25.times do |i|
-          misc_movie_data = {
-            id: i,
-            title: "Some movie #{i}",
-            vote_average: i % 10
-          }
-
-          movies_data << misc_movie_data
-        end
-
-        #Stub TMDB for appropriate response in controller
-        stub_request(:get, "https://api.themoviedb.org/3/movie/top_rated").to_return(status: 200, body: ({ results: movies_data }).to_json)
-        get api_v1_movies_path
-
-        misc_movies_json = JSON.parse(response.body, symbolize_names: true)
-        expect(misc_movies_json[:data]).to be_a(Array)
-        expect(misc_movies_json[:data].length).to eq(20)
+      movies_json[:data].each do |movie_data|
+        expect(movie_data).to have_key(:id)
+        expect(movie_data).to have_key(:type)
+        expect(movie_data[:type]).to eq("movie")
+        expect(movie_data).to have_key(:attributes)
+        expect(movie_data[:attributes]).to have_key(:title)
+        expect(movie_data[:attributes]).to have_key(:vote_average)
       end
     end
 
-    context "sad path (request invalid / edge cases)" do
+    it "lists a maximum of 20 movies" do
+      movies_data = []
+      25.times do |i|
+        misc_movie_data = {
+          id: i,
+          title: "Some movie #{i}",
+          vote_average: i % 10
+        }
 
+        movies_data << misc_movie_data
+      end
+
+      #Stub TMDB for appropriate response in controller (trying before VCR implementation)
+      stub_request(:get, "https://api.themoviedb.org/3/movie/top_rated").to_return(status: 200, body: ({ results: movies_data }).to_json)
+      get api_v1_movies_path
+
+      misc_movies_json = JSON.parse(response.body, symbolize_names: true)
+      expect(misc_movies_json[:data]).to be_a(Array)
+      expect(misc_movies_json[:data].length).to eq(20)
     end
   end
 
   describe "List movies based on title name search" do
     context "happy path (request valid)" do
       xit "returns appropriately formatted list", :vcr do
-
-        #NOTE: can't get VCR to work correctly here.  Maybe b/c parameters / non-deterministic aspects?
-        #Ask tomorrow AM...
-
         get "#{api_v1_movies_path}?search=rings"
         filtered_movies_json = JSON.parse(response.body, symbolize_names: true)
 
-        binding.pry
-
         expect(response).to be_successful
-
         expect(filtered_movies_json).to have_key(:data)
         expect(filtered_movies_json[:data]).to be_a(Array)
 
@@ -104,6 +85,7 @@ RSpec.describe "Movies API", type: :request do
 
     context "sad path (request invalid / edge cases)" do
       it "" do
+        #NOTE: not implemented
         #Query parameter not present (probably will need to change API endpoint to ./movies/search or something)
       end
     end
@@ -112,14 +94,10 @@ RSpec.describe "Movies API", type: :request do
 
   describe "Shows details for a specified movie" do
     it "correctly returns all movie details", :vcr do
-      #NOTE: again, VCR issue?
-
       specified_movie_id = 278    #Shawshank Redemption at TMDB (unless they reorder the IDs!)
       get api_v1_movie_path(specified_movie_id)
       movie_details = JSON.parse(response.body, symbolize_names: true)
 
-      binding.pry
-      
       expect(response).to be_successful
       #General structure
       expect(movie_details).to have_key(:data)
@@ -135,8 +113,6 @@ RSpec.describe "Movies API", type: :request do
       expect(movie_details[:data][:attributes]).to have_key(:genres)
       expect(movie_details[:data][:attributes][:genres]).to be_a(Array)
       expect(movie_details[:data][:attributes]).to have_key(:summary)
-      
-
       #Cast details, including limit to 10
       expect(movie_details[:data][:attributes]).to have_key(:cast)
       expect(movie_details[:data][:attributes][:cast]).to be_a(Array)
@@ -146,7 +122,6 @@ RSpec.describe "Movies API", type: :request do
         expect(cast_member).to have_key(:character)
         expect(cast_member).to have_key(:actor)
       end
-
       #Reviews details, including limit to 5
       expect(movie_details[:data][:attributes]).to have_key(:total_reviews)
       expect(movie_details[:data][:attributes][:total_reviews]).to be_a(Integer)
@@ -159,9 +134,5 @@ RSpec.describe "Movies API", type: :request do
         expect(reviewer).to have_key(:review)
       end
     end
-
-    #Should probably do sad path if movie ID doesn't exist via TMDB API call...
-
   end
-
 end
