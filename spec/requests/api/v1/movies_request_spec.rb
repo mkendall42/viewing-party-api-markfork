@@ -54,4 +54,44 @@ RSpec.describe "Movies API", type: :request do
     end
   end
 
+  describe "List movies based on title name search" do
+    context "happy path (request valid)" do
+      it "returns appropriately formatted list", :vcr do
+
+        #NOTE: can't get VCR to work correctly here.  Maybe b/c parameters / non-deterministic aspects?
+        #Ask tomorrow AM...
+        
+        get "#{api_v1_movies_path}?search=rings"
+        filtered_movies_json = JSON.parse(response.body, symbolize_names: true)
+
+        binding.pry
+
+        expect(response).to be_successful
+
+        expect(filtered_movies_json).to have_key(:data)
+        expect(filtered_movies_json[:data]).to be_a(Array)
+
+        filtered_movies_json[:data].each do |movie_data|
+          expect(movie_data).to have_key(:id)
+          expect(movie_data).to have_key(:type)
+          expect(movie_data[:type]).to eq("movie")
+          expect(movie_data).to have_key(:attributes)
+          expect(movie_data[:attributes]).to have_key(:title)
+          expect(movie_data[:attributes]).to have_key(:vote_average)
+        end
+      end
+
+      it "returns correct lists (2 examples), and limited to 20 entries", :vcr do
+
+      end
+    end
+
+    context "sad path (request invalid / edge cases)" do
+      it "" do
+        #Query parameter not present (probably will need to change API endpoint to ./movies/search or something)
+      end
+    end
+
+  end
+
 end
