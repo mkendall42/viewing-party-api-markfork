@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       resources :sessions, only: :create
       resources :movies, only: [:index, :show]
       resources :viewing_parties, only: [:create, :update]    #Plural, though kinda doesn't make sense here...
+      resources :viewing_party_registrations, only: :create
 
       #Need to add some more here.  For now, no nesting needed.  Of note:
       #Users - update the above: retrieve profile (show)
